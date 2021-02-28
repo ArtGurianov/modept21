@@ -1,10 +1,11 @@
 import {
-  Injectable,
+  Injectable, InternalServerErrorException,
 } from '@nestjs/common';
+import { InjectQueue } from '@nestjs/bull';
 import * as nodemailer from "nodemailer";
 import { ConfigService } from '@nestjs/config';
-import { RedisService } from '../redis/redis.service';
 import { EmailDataDto } from './dto/emailData.dto';
+import { Queue } from 'bull';
 
 interface MailerEnv {
   host: string;
@@ -18,9 +19,14 @@ export class EmailService {
 
   public constructor(
     private readonly configService: ConfigService,
-    private readonly redisService: RedisService,
+    @InjectQueue('email') private emailQueue: Queue,
   ) {
-    const {host, port, apiKey} = this.configService.get<MailerEnv>('mailer', {host: 'NotProvided', port: -1, apiKey: 'NotProvided'});
+    const emailConfig = this.configService.get<MailerEnv>('mailer');
+    if (!emailConfig) {
+      throw new InternalServerErrorException('cannot resolve email config.');
+    }
+    const {host, port, apiKey} = emailConfig;
+    
     this.emailTransporter = nodemailer.createTransport({
       host,
       port,
@@ -33,6 +39,7 @@ export class EmailService {
   }
 
   async pushToEmailQueue(emailDataDto: EmailDataDto): Promise<boolean> {
+    await this.emailQueue.add('sendEmailJob', emailDataDto, {removeOnComplete: true});
     return true;
   }
   

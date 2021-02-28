@@ -2,6 +2,7 @@ import Joi from '@hapi/joi';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_FILTER, APP_GUARD } from '@nestjs/core';
+import { BullModule } from '@nestjs/bull';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AgencyModule } from './agency/agency.module';
 import { AppController } from './app.controller';
@@ -13,6 +14,7 @@ import { JwtService } from './jwt/jwt.service';
 import { UserModule } from './user/user.module';
 import { ForbiddenExceptionFilter } from './utils/forbiddenException.filter';
 import { AuthGuard } from './utils/guards/auth.guard';
+import { BullConfigService } from './config/bullConfig.service';
 
 @Module({
   imports: [
@@ -43,6 +45,10 @@ import { AuthGuard } from './utils/guards/auth.guard';
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useClass: TypeOrmConfigService,
+    }),
+    BullModule.forRootAsync({
+      imports: [ConfigModule],
+      useClass: BullConfigService,
     }),
     UserModule,
     AgencyModule,
