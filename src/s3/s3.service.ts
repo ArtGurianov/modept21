@@ -15,9 +15,18 @@ import { v4 } from 'uuid';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FileRepository } from '../file/file.repository';
 
+interface AwsConfig {
+  s3BucketUrl: string, 
+  s3BucketName: string, 
+  awsAccessKeyId: string, 
+  awsSecretAccessKey: string, 
+  awsRegion: string,
+}
+
 @Injectable()
 export class S3Service {
   private readonly s3Storage: S3;
+  private readonly awsConfig: AwsConfig;
   
   public constructor(
     @InjectRepository(FileRepository)
@@ -25,15 +34,17 @@ export class S3Service {
     private readonly redisService: RedisService,
     private readonly configService: ConfigService,
   ) {
+    const awsConfig = this.configService.get<AwsConfig>('aws');
+    if (!awsConfig) {
+      throw new InternalServerErrorException('no aws config provided');
+    }
+    this.awsConfig = awsConfig;
+
     this.s3Storage = new S3({
       signatureVersion: 'v4',
-      region: 'eu-central-1', //region should come from env
-      accessKeyId: configService.get<string>(
-        'awsAccessKeyId'
-      ),
-      secretAccessKey: configService.get<string>(
-        'awsSecretAccessKey'
-      ),
+      region: awsConfig.awsRegion,
+      accessKeyId: awsConfig.awsAccessKeyId,
+      secretAccessKey: awsConfig.awsSecretAccessKey,
     });
   }
 
@@ -62,9 +73,7 @@ export class S3Service {
     const s3FilePath = `${mimeTypeParts[0]}/${v4()}.${mimeTypeParts[1]}`;
     const presignedUrl = await this.s3Storage.getSignedUrl('putObject', {
       ACL: 'public-read',
-      Bucket: this.configService.get<string>(
-        's3BucketName'
-      ),
+      Bucket: this.awsConfig.s3BucketName,
       Key: s3FilePath,
       Expires: 60, // seconds
       ContentType: mimeType,

@@ -21,18 +21,36 @@ export class RedisService {
     time?: number,
     //expiryMode?: string | any[],
     //setMode?: number | string,
-  ): Promise<boolean> {
-    if (time) {
-      return await this.client.set(key, value, 'EX', time);
-    }
-    return await this.client.set(key, value);
+  ): Promise<"OK" | undefined> {
+    return new Promise<"OK" | undefined>((resolve, reject) => {
+      this.client.set(key, value, 'EX', time=-1, (err, data) => {
+        if (err) {
+          return reject(err);
+        }
+        resolve(data);
+      });
+    });
   }
 
-  public async get(key: string): Promise<boolean> {
-    return await this.client.get(key);
+  public async get(key: string): Promise<string | null> {
+    return new Promise<string | null>((resolve, reject) => {
+      this.client.get(key, (err, data) => {
+        if (err) {
+          return reject(err);
+        }
+        resolve(data);
+      });
+    });
   }
 
-  public async del(key: string): Promise<boolean> {
-    return await this.client.del(key);
+  public async del(key: string): Promise<number> {
+    return new Promise<number>((resolve, reject) => {
+      this.client.del(key, (err, data) => {
+        if (err) {
+          return reject(err);
+        }
+        resolve(data);
+      });
+    });
   }
 }
