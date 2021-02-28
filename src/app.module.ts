@@ -3,13 +3,11 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { WinstonModule } from 'nest-winston';
 import { AgencyModule } from './agency/agency.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import appConfig from './config/appConfig';
 import { TypeOrmConfigService } from './config/typeormConfig.service';
-import { WinstonConfigService } from './config/winstonConfig.service';
 import { ContractModule } from './contract/contract.module';
 import { JwtService } from './jwt/jwt.service';
 import { UserModule } from './user/user.module';
@@ -45,10 +43,6 @@ import { AuthGuard } from './utils/guards/auth.guard';
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useClass: TypeOrmConfigService,
-    }),
-    WinstonModule.forRootAsync({
-      imports: [ConfigModule],
-      useClass: WinstonConfigService,
     }),
     UserModule,
     AgencyModule,

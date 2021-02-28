@@ -1,7 +1,6 @@
-import { Controller, Get, Inject, LoggerService, OnApplicationBootstrap } from '@nestjs/common';
+import { Controller, Get, OnApplicationBootstrap, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ApiTags } from '@nestjs/swagger';
-import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 
 import { AppService } from './app.service';
 import { Public } from './utils/decorators/public.decorator';
@@ -9,9 +8,8 @@ import { Public } from './utils/decorators/public.decorator';
 @ApiTags('app')
 @Controller()
 export class AppController implements OnApplicationBootstrap {
-  constructor(private readonly appService: AppService, 
-    @Inject(WINSTON_MODULE_NEST_PROVIDER)
-    private readonly logger: LoggerService,
+  private readonly logger = new Logger(AppController.name);
+  constructor(private readonly appService: AppService,
     private readonly configService: ConfigService) {
     }
 

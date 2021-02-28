@@ -4,15 +4,18 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
-import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
+import {v4} from 'uuid';
+import {Request, Response} from 'express';
 
 import { AppModule } from './app.module';
+import { ASYNC_STORAGE } from './logger/logger.constants';
+import { PinoLoggerService } from './logger/pinoLogger.service';
 import { defaultInsecureKey } from './utils/constants';
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule);
-
-  app.useLogger(app.get(WINSTON_MODULE_NEST_PROVIDER));
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
+    logger: true,
+  });
   app.use(helmet());
   app.use(
     rateLimit({
@@ -21,6 +24,15 @@ async function bootstrap() {
     }),
   );
   app.set('trust proxy', 1);
+  app.use((req: Request, _:Response, next: any) => {
+    const asyncStorage = app.get(ASYNC_STORAGE);
+    const traceId = req.headers['x-request-id'] || v4();
+    const store = new Map().set('traceId', traceId);
+    asyncStorage.run(store, () => {
+      next();
+    });
+  });
+  app.useLogger(app.get(PinoLoggerService));
 
   const configService = app.get(ConfigService);
   app.enableCors({

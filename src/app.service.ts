@@ -1,12 +1,10 @@
 import {
-  Inject,
   Injectable,
   InternalServerErrorException,
-  LoggerService,
   OnApplicationShutdown,
+  Logger
 } from '@nestjs/common';
 import { InjectConnection, InjectRepository } from '@nestjs/typeorm';
-import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { Connection } from 'typeorm';
 import { Agency } from './agency/agency.entity';
 import { AgencyRepository } from './agency/agency.repository';
@@ -32,10 +30,9 @@ import { fakeAgencyId1, fakeAgencyId2, fakeBasicAdminId, fakeBasicBookerId, fake
 
 @Injectable()
 export class AppService implements OnApplicationShutdown {
-  public constructor(
+  private readonly logger = new Logger(AppService.name);
+  constructor(
     @InjectConnection() readonly connection: Connection,
-    @Inject(WINSTON_MODULE_NEST_PROVIDER)
-    private readonly logger: LoggerService,
     @InjectRepository(Admin)
     private readonly adminRepo: AdminRepository,
     @InjectRepository(Agency)
