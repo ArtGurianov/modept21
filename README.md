@@ -1,75 +1,147 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo_text.svg" width="320" alt="Nest Logo" /></a>
-</p>
-
-[travis-image]: https://api.travis-ci.org/nestjs/nest.svg?branch=master
-[travis-url]: https://travis-ci.org/nestjs/nest
-[linux-image]: https://img.shields.io/travis/nestjs/nest/master.svg?label=linux
-[linux-url]: https://travis-ci.org/nestjs/nest
-  
-  <p align="center">A progressive <a href="http://nodejs.org" target="blank">Node.js</a> framework for building efficient and scalable server-side applications, heavily inspired by <a href="https://angular.io" target="blank">Angular</a>.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore"><img src="https://img.shields.io/npm/dm/@nestjs/core.svg" alt="NPM Downloads" /></a>
-<a href="https://travis-ci.org/nestjs/nest"><img src="https://api.travis-ci.org/nestjs/nest.svg?branch=master" alt="Travis" /></a>
-<a href="https://travis-ci.org/nestjs/nest"><img src="https://img.shields.io/travis/nestjs/nest/master.svg?label=linux" alt="Linux" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#5" alt="Coverage" /></a>
-<a href="https://gitter.im/nestjs/nestjs?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=body_badge"><img src="https://badges.gitter.im/nestjs/nestjs.svg" alt="Gitter" /></a>
-<a href="https://opencollective.com/nest#backer"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec"><img src="https://img.shields.io/badge/Donate-PayPal-dc3d53.svg"/></a>
-  <a href="https://twitter.com/nestframework"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
-
 ## Description
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+Voicy api is a graphql app for digital gift cards system.
 
-## Installation
+## Local run
 
-```bash
-$ npm install
-```
-
-## Running the app
+App could be run without building:
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+$ yarn run start
 ```
 
-## Test
+Or first build the app:
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+$ yarn run build
 ```
 
-## Support
+and then run passing the env file (look at `.env.example`):
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+```bash
+$ yarn run start:prod -- dotenv_config_path=../.env # note the space between -- and the argument
+```
+
+
+## API Documentation
+
+On non-production environments, API documentation is accessible at the `/swagger` endpoint.
+
+E.g. `http://localhost:8000/swagger`
+
+## Installation and Setup
+
+DO steps.
+
+---
+
+### Dokku app creation
+
+```bash
+$ dokku apps:create voicy
+```
+
+### POSTGRES SETUP
+
+```bash
+$ sudo dokku plugin:install https://github.com/dokku/dokku-postgres.git postgres
+$ dokku postgres:create voicy-production-pg
+$ dokku postgres:link voicy-production-pg voicy
+# internal DATABASE_URL: postgres://postgres:e35444147366d4e932fc455bce445f3a@dokku-postgres-voicy-production-pg:5432/voicy_production_pg
+$ dokku postgres:expose voicy-production-pg 17825
+# external DATABASE_URL: postgres://postgres:e35444147366d4e932fc455bce445f3a@api.voicy.ru:17825/voicy_production_pg
+```
+### REDIS SETUP
+
+```bash
+$ sudo dokku plugin:install https://github.com/dokku/dokku-redis.git redis
+$ dokku redis:create voicy-production-redis
+$ dokku redis:link voicy-production-redis voicy
+# REDIS_URL: redis://voicy-production-redis:64ad3f0112717bef13b24274d37abc1615aeb11a49d073706579baba13c6f2c3@dokku-redis-voicy-production-redis:6379
+```
+
+### CICLECI SETUP
+#### NEW SSH
+
+```bash
+$ ssh-keygen -m pem -t rsa -C "artgurianov@yandex.ru"
+# /Users/art/.ssh/voicy-production-circleci-ssh
+```
+
+#### ADDING SSH TO DOKKU
+
+```bash
+$ cat ~/.ssh/voicy-production-circleci-ssh.pub | ssh root@164.90.224.15 "sudo sshcommand acl-add dokku voicy-production-circleci-ssh"
+# EXEC RESULT - SHA256:XnPlu0irzfTA8pKy0wI3V/wZ77DbCH+iCbVn1BUMug4
+```
+
+#### ADDING SSH TO CIRCLECI
+
+```bash
+$ cat ~/.ssh/voicy-production-circleci-ssh
+# using hostname voicy-production
+```
+
+---
+
+### MANUAL FIRST DEPLOY TO DOKKU.
+
+Locally:
+
+```bash
+$ docker build -t artgurianov/voicy:latest --no-cache .
+$ docker push artgurianov/voicy:latest
+```
+
+On dokku server:
+
+```bash
+$ ssh root@164.90.224.15
+$ docker pull artgurianov/voicy:latest
+$ docker tag artgurianov/voicy:latest dokku/voicy:latest
+$ dokku tags:deploy voicy latest
+$ dokku apps:report voicy
+$ dokku logs voicy
+```
+
+---
+
+### DOKKU SET ENV VARIABLES
+
+```bash
+$ dokku config:set voicy NODE_ENV=production SERVER_PORT=8000 FRONTEND_HOST_URL=http://localhost:3000 WITAI_KEY=MCPD2GSCYO77BINHZN7TGOPPQV5OPTHZ JWT_ACCESS_SECRET=secret1 JWT_REFRESH_SECRET=secret2 SUPER_ADMIN_EMAIL=artgurianov@yandex.ru SUPER_ADMIN_PASSWORD=Qwerty123 S3_BUCKET_URL=https://aws.s3/user15132/ S3_BUCKET_NAME=voicy2020 AWS_ACCESS_KEY_ID=AKIAJ2FPUL67J2BKE75A AWS_SECRET_ACCESS_KEY=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 AWS_REGION=eu-central-1
+```
+
+---
+
+### DOCKER COMPOSE
+
+```bash
+$ docker-compose up --build -V --force-recreate
+$ # docker-compose --env-file .env exec postgres psql -U postgres
+$ exec postgres env
+```
+
+### DOMAIN SETUP
+
+```bash
+$ dokku domains:report voicy
+$ dokku domains:clear-global
+$ dokku domains:set voicy api.voicy.ru
+$ dokku proxy:report voicy #need to change 5000 to whatever port we set
+$ dokku proxy:ports-set voicy http:80:8000
+```
+
+### LETSENCRYPT SETUP
+
+```bash
+$ sudo dokku plugin:install https://github.com/dokku/dokku-letsencrypt.git
+$ dokku config:set --no-restart voicy DOKKU_LETSENCRYPT_EMAIL=artgurianov@yandex.ru
+$ dokku letsencrypt voicy
+$ # ports are configured automatically
+$ dokku letsencrypt:cron-job --add
+```
 
 ## Stay in touch
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-  Nest is [MIT licensed](LICENSE).
+- Author - [Art Gurianov](https://github.com/artgurianov)
