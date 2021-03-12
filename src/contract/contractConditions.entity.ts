@@ -1,21 +1,24 @@
 import { BaseEntity, Column, CreateDateColumn, Entity, PrimaryColumn, UpdateDateColumn } from 'typeorm';
 
 @Entity()
-export class Conditions extends BaseEntity {
+export class ContractConditions extends BaseEntity {
   @PrimaryColumn('uuid')
   id!: string;
+
+  @Column({type: 'int'})
+  agencyCommissionPercent: number;
 
   @Column({type: 'text'})
   visaType: 'working' | 'business' | 'travel';
 
   @Column({type: 'boolean'})
-  flightLoan: boolean;
+  flightCredit: boolean;
 
   @Column({type: 'boolean'})
-  apartmentLoan: boolean;
+  apartmentCredit: boolean;
 
   @Column({type: 'boolean'})
-  pocketMoneyLoan: boolean;
+  pocketMoneyCredit: boolean;
 
   @Column({type: 'text'})
   guaranteeType: 'gross' | 'net';
@@ -30,7 +33,7 @@ export class Conditions extends BaseEntity {
   periodFrom: Date;
 
   @CreateDateColumn({ type: "timestamp with time zone" })
-  periodUntil: Date;
+  periodTill: Date;
 
   @CreateDateColumn({ type: "timestamp with time zone" })
   createdAt: Date;

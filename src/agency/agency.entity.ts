@@ -1,6 +1,5 @@
 import { BaseEntity, Column, CreateDateColumn, Entity, OneToMany, PrimaryColumn, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
-import { ModelingContract } from '../contract/modelingContract.entity';
-import { MotherContract } from '../contract/motherContract.entity';
+import { Contract } from '../contract/contract.entity';
 import { Booker } from '../user/booker/booker.entity';
 import { Booker2Agency } from './booker2agency.entity';
 
@@ -21,11 +20,8 @@ export class Agency extends BaseEntity {
   @Column({ type: 'text' })
   vat!: string;
 
-  @OneToMany(() => MotherContract, contract => contract.motherAgencyConnection)
-  contractsAsMotherAgencyConnection: Promise<MotherContract[] | null>;
-
-  @OneToMany(() => ModelingContract, contract => contract.modelingAgencyConnection)
-  contractsAsModelingAgencyConnection: Promise<ModelingContract[] | null>;
+  @OneToMany(() => Contract, contract => contract.agencyConnection)
+  contractsConnection: Promise<Contract[] | null>;
 
   @OneToMany(() => Booker2Agency, b2a => b2a.agency)
   bookersConnection: Promise<Booker2Agency[]>;

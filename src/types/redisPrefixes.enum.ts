@@ -4,5 +4,6 @@ export const enum REDIS_PREFIXES {
   CONFIRM = 'confirm:',
   BANNED = 'banned:',
   UPLOAD_S3 = 'uploadS3:',
-  OTP = 'otp:',
+  LOGIN_OTP = 'loginOtp:',
+  INVITATION_OTP = 'invitationOtp:'
 }

@@ -1,5 +1,5 @@
 import { AfterLoad, BaseEntity, Column, CreateDateColumn, Entity, JoinColumn, OneToMany, OneToOne, PrimaryColumn, UpdateDateColumn } from 'typeorm';
-import { ModelingContract } from '../../contract/modelingContract.entity';
+import { ModelingContract } from '../../contract/contract.entity';
 import { MotherContract } from '../../contract/motherContract.entity';
 import { User } from '../user.entity';
 
@@ -7,6 +7,9 @@ import { User } from '../user.entity';
 export class Model extends BaseEntity {
   @PrimaryColumn('uuid')
   id!: string;
+
+  @Column({ type: 'text', nullable: false })
+  email!: string;
 
   @Column({ type: 'text', nullable: false })
   firstName!: string;

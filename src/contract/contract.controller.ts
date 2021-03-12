@@ -7,7 +7,7 @@ import { UserTypes } from '../types/userTypes.enum';
 import { AllowedUserTypes } from '../utils/decorators/allowedUserTypes.decorator';
 import { Request } from 'express';
 import { ContractService } from './contract.service';
-import { Conditions } from './conditions.entity';
+import { ContractConditions } from './contractConditions.entity';
 import { NewModelInvitationDto } from '../user/model/dto/newModelInvitation.dto';
 
 @ApiTags('contract')
@@ -23,14 +23,14 @@ export class ContractController {
     @Body('newModelInvitationDto') newModelInvitationDto: NewModelInvitationDto,
     @Req() { jwtPayload }: Request,
   ): Promise<boolean> {
-    return await this.contractService.sendNewModelInvitation(newModelInvitationDto, jwtPayload!.agencyId, jwtPayload!.userId);
+    return await this.contractService.createNewModelInvitation(newModelInvitationDto, jwtPayload!.agencyId, jwtPayload!.userId);
   }
   
   @AllowedUserTypes(UserTypes.BOOKER)
   @Post('/newMotherContract')
   async newMotherContract(
     @Body('modelId') modelId: string,
-    @Body('conditions') conditions: Conditions,
+    @Body('conditions') conditions: ContractConditions,
     @Req() { jwtPayload }: Request,
   ): Promise<boolean> {
     return await this.contractService.newMotherContract(jwtPayload?.agencyId, jwtPayload?.userId, modelId, conditions);

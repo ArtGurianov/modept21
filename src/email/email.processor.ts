@@ -1,6 +1,6 @@
 import { Processor, Process } from '@nestjs/bull';
 import { InternalServerErrorException, Logger } from '@nestjs/common';
-import { EmailService } from '../email.service';
+import { EmailService } from './email.service';
 import { Job } from 'bull';
 
 @Processor('email')
@@ -15,10 +15,9 @@ export class EmailProcessor {
   async sendEmail(job: Job): Promise<boolean> {
     const success = await this.emailService.sendEmail(job.data);
     if (!success) {
-      throw new InternalServerErrorException('crashed on processing email queue.');
+      throw new InternalServerErrorException('crashed at processing email queue.');
     }
     this.logger.log('email sent!');
     return true;
   }
-
 }

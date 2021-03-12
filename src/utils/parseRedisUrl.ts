@@ -1,6 +1,13 @@
 import { URL } from 'url';
 
-export const parseRedisUrl = (url: string) => {
+export interface RedisConfig {
+  host: string,
+  port: number,
+  db: number,
+  password?: string,
+}
+
+export const parseRedisUrl = (url: string): RedisConfig => {
   const parsedUrl = new URL(url);
   if (!parsedUrl) {
     throw new Error('invalid url string');

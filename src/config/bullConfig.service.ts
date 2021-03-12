@@ -1,14 +1,8 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { SharedBullConfigurationFactory, BullModuleOptions } from '@nestjs/bull';
 import { ConfigService } from '@nestjs/config';
-import { parseRedisUrl } from '../utils/parseRedisUrl';
+import { parseRedisUrl, RedisConfig } from '../utils/parseRedisUrl';
 
-interface RedisConfig {
-  host: string,
-  port: number,
-  db: number,
-  password?: string,
-}
 
 @Injectable()
 export class BullConfigService implements SharedBullConfigurationFactory {

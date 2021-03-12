@@ -21,7 +21,7 @@ export class AuthService {
   async sendOtp(email: string): Promise<boolean> {
     const otp = otpGen();
     await this.redisService.set(
-      `${REDIS_PREFIXES.OTP}${otp}`,
+      `${REDIS_PREFIXES.LOGIN_OTP}${otp}`,
       email,
       60 * 10,
     );
@@ -31,12 +31,12 @@ export class AuthService {
 
   async validateOtp(email: string, otp: string): Promise<boolean> {
     const storedEmail = await this.redisService.get(
-      `${REDIS_PREFIXES.OTP}${otp}`,
+      `${REDIS_PREFIXES.LOGIN_OTP}${otp}`,
     );
     if (!storedEmail) {
       throw new UnauthorizedException();
     }
-    await this.redisService.del(`${REDIS_PREFIXES.OTP}${otp}`);
+    await this.redisService.del(`${REDIS_PREFIXES.LOGIN_OTP}${otp}`);
     if (storedEmail !== email) {
       throw new UnauthorizedException();
     }

@@ -1,5 +1,5 @@
 import { Type } from '@nestjs/common';
-import { ModelingContract } from '../../contract/modelingContract.entity';
+import { ModelingContract } from '../../contract/contract.entity';
 import { MotherContract } from '../../contract/motherContract.entity';
 import { ContractTypes } from '../../types/contractTypes.enum';
 import { UserTypes } from '../../types/userTypes.enum';
